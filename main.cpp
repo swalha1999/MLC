@@ -26,7 +26,8 @@ int main(){
     }   
 
     PRINT_M(m1);
-    PRINT_M(m1.slice(1, 4, 2, 5));
-
+    auto m2 = m1.slice(0, 3, 0, 3);
+    PRINT_M(m2);
+    PRINT_M(m1.slice(0, 3, 0, 3));
 
 }
