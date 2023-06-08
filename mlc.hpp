@@ -138,7 +138,6 @@ public:
         return *this;
     }
 
-    // rewrite this
     Matrix& operator*=(const Matrix& m){
         Matrix result(_rows, m._cols);
         
