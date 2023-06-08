@@ -39,10 +39,9 @@ public:
     }
 
     ~Matrix(){
-        delete[] _data;
+        if (_data != nullptr && !_is_slice) delete[] _data;
     }
 
-    
     Matrix& operator=(const Matrix& m){
         if (this != &m){
             
@@ -61,46 +60,54 @@ public:
         return *this;
     }
     
-    //rewrite this
-    Matrix operator+(const Matrix& m) const {
-        Matrix result(_rows, _cols);
-        for (size_m i = 0; i < _rows*_cols; i++){
-            result._data[i] = _data[i] + m._data[i];
+    Matrix& operator+(const Matrix& m) const {
+        if (_rows != m._rows || _cols != m._cols){
+            throw std::invalid_argument("Matrix dimensions must agree");
         }
-        return result;
+        Matrix* result = new Matrix(_rows, _cols);
+        for (size_m i = 0; i < _rows; ++i){
+            for (size_m j = 0; j < _cols; ++j){
+                (*result)(i,j) = (*this)(i,j) + m(i,j);
+            }
+        }
+        return *result;
     }
 
-    // rewrite this
-    Matrix operator-(const Matrix& m) const {
-        Matrix result(_rows, _cols);
-        for (size_m i = 0; i < _rows*_cols; ++i){
-            result._data[i] = _data[i] - m._data[i];
+    Matrix& operator-(const Matrix& m) const {
+        if (_rows != m._rows || _cols != m._cols){
+            throw std::invalid_argument("Matrix dimensions must agree");
         }
-        return result;
+        Matrix* result = new Matrix(_rows, _cols);
+        for (size_m i = 0; i < _rows; ++i){
+            for (size_m j = 0; j < _cols; ++j){
+                (*result)(i,j) = (*this)(i,j) - m(i,j);
+            }
+        }
+        return *result;
     }
     
-
-    Matrix operator*(const Matrix& m) const{
-        Matrix result(_rows, m._cols);
+    Matrix& operator*(const Matrix& m) const{
+        Matrix* result = new Matrix(_rows, m._cols);
         for (size_m i = 0; i < _rows; i++){
             for (size_m j = 0; j < m._cols; j++){
                 double sum = 0;
                 for (size_m k = 0; k < _cols; k++){
                     sum += _data[i*_skip + k] * m._data[k*m._skip + j];
                 }
-                result._data[i*result._skip + j] = sum;
+                result->_data[i* result->_skip + j] = sum;
             }
         }
-        return result;
+        return *result;
     }
 
-    // rewrite this 
-    Matrix operator*(double d) const {
-        Matrix result(_rows, _cols);
-        for (size_m i = 0; i < _rows*_cols; i++){
-            result._data[i] = _data[i] * d;
+    Matrix& operator*(double d) const {
+        Matrix* result = new Matrix(_rows, _cols);
+        for (size_m row = 0; row < _rows; row++){
+            for (size_m col = 0; col < _cols; col++){
+                (*result)(row,col) = (*this)(row,col) * d;
+            }
         }
-        return result;
+        return *result;
     }
     
     Matrix& operator/(double d) const {
@@ -113,18 +120,20 @@ public:
         return *result;
     }
 
-    // rewrite this
     Matrix& operator+=(const Matrix& m){
-        for (size_m i = 0; i < _rows*_cols; i++){
-            _data[i] += m._data[i];
+        for (size_m i = 0; i < _rows; i++){
+            for (size_m j = 0; j < _cols; j++){
+                _data[i*_skip + j] += m._data[i*_skip + j];
+            }
         }
         return *this;
     }
 
-    // rewrite this
     Matrix& operator-=(const Matrix& m){
-        for (size_m i = 0; i < _rows*_cols; i++){
-            _data[i] -= m._data[i];
+       for (size_m i = 0; i < _rows; i++){
+            for (size_m j = 0; j < _cols; j++){
+                _data[i*_skip + j] -= m._data[i*_skip + j];
+            }
         }
         return *this;
     }
@@ -143,7 +152,12 @@ public:
             }
         }
 
-        *this = result;
+        for (size_m i = 0; i < _rows; i++){
+            for (size_m j = 0; j < m._cols; j++){
+                (*this)(i,j) = result(i, j);
+            }
+        }
+        
         return *this;
     }
 
@@ -191,4 +205,15 @@ public:
         
         return *result;
     }
+
+    Matrix& copy() const{
+        Matrix* result = new Matrix(_rows, _cols);
+        for (size_m i = 0; i < _rows; i++){
+            for (size_m j = 0; j < _cols; j++){
+                (*result)(i,j) = (*this)(i,j);
+            }
+        }
+        return *result;
+    }
+
 };
