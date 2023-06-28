@@ -255,12 +255,12 @@ public:
         }
     }
 
-    Matrix<T> copy(){
+    Matrix<T> copy() const {
         // make a deep copy of the matrix
         Matrix<T> m = Matrix<T>(_rows, _cols);
         for (size_m i = 0; i < _rows; i++){
             for (size_m j = 0; j < _cols; j++){
-                (*m)(i, j) = (*this)(i, j);
+                (m)(i, j) = (*this)(i, j);
             }
         }
         return m; 
